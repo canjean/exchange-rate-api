@@ -1,0 +1,542 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Canjean Exchange Rate API",
+    "version": "1.0.0",
+    "description": "Free exchange rate API with no API key. Daily reference rates for 150+ currencies (plus BTC) in JSON, CSV or plain text, ready for Google Sheets (IMPORTDATA) and Excel (WEBSERVICE). Data from a public-domain (CC0) dataset compiled from central banks and markets. Limit: 120 requests per minute per IP. Please credit Canjean with a link.",
+    "contact": {
+      "name": "Canjean",
+      "url": "https://canjean.com/exchange-rate-api",
+      "email": "contact@canjean.com"
+    },
+    "termsOfService": "https://canjean.com/exchange-rate-api",
+    "x-logo": {
+      "url": "https://canjean.com/assets/img/icon-512.png"
+    }
+  },
+  "externalDocs": {
+    "description": "Documentation and spreadsheet examples",
+    "url": "https://canjean.com/exchange-rate-api"
+  },
+  "servers": [
+    {
+      "url": "https://canjean.com/api"
+    }
+  ],
+  "paths": {
+    "/rate/{from}/{to}.txt": {
+      "get": {
+        "summary": "Exchange rate as plain text",
+        "operationId": "getRateText",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Base currency (ISO 4217)",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{3}$",
+              "example": "USD"
+            }
+          },
+          {
+            "name": "to",
+            "in": "path",
+            "required": true,
+            "description": "Target currency (ISO 4217)",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{3}$",
+              "example": "EUR"
+            }
+          },
+          {
+            "name": "decimal",
+            "in": "query",
+            "required": false,
+            "description": "Use `comma` to get a decimal comma in plain-text responses (spreadsheets in many European locales).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "comma"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rate as a number",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "0.888026"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown currency or endpoint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (120 requests per minute per IP)"
+          }
+        }
+      }
+    },
+    "/rate/{from}/{to}.json": {
+      "get": {
+        "summary": "Exchange rate as JSON",
+        "operationId": "getRate",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Base currency (ISO 4217)",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{3}$",
+              "example": "USD"
+            }
+          },
+          {
+            "name": "to",
+            "in": "path",
+            "required": true,
+            "description": "Target currency (ISO 4217)",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{3}$",
+              "example": "EUR"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rate"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown currency or endpoint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (120 requests per minute per IP)"
+          }
+        }
+      }
+    },
+    "/convert/{amount}/{from}/{to}.txt": {
+      "get": {
+        "summary": "Convert an amount (plain text)",
+        "operationId": "convertText",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "example": 100
+            }
+          },
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Base currency",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{3}$",
+              "example": "USD"
+            }
+          },
+          {
+            "name": "to",
+            "in": "path",
+            "required": true,
+            "description": "Target currency",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{3}$",
+              "example": "EUR"
+            }
+          },
+          {
+            "name": "decimal",
+            "in": "query",
+            "required": false,
+            "description": "Use `comma` to get a decimal comma in plain-text responses (spreadsheets in many European locales).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "comma"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Converted amount",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "88.802587"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown currency or endpoint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown currency or endpoint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (120 requests per minute per IP)"
+          }
+        }
+      }
+    },
+    "/convert/{amount}/{from}/{to}.json": {
+      "get": {
+        "summary": "Convert an amount (JSON)",
+        "operationId": "convert",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "example": 100
+            }
+          },
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "description": "Base currency",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{3}$",
+              "example": "USD"
+            }
+          },
+          {
+            "name": "to",
+            "in": "path",
+            "required": true,
+            "description": "Target currency",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{3}$",
+              "example": "EUR"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conversion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Conversion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown currency or endpoint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown currency or endpoint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (120 requests per minute per IP)"
+          }
+        }
+      }
+    },
+    "/rates/{base}.json": {
+      "get": {
+        "summary": "All rates for a base currency (JSON)",
+        "operationId": "getRates",
+        "parameters": [
+          {
+            "name": "base",
+            "in": "path",
+            "required": true,
+            "description": "Base currency",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{3}$",
+              "example": "EUR"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rates"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown currency or endpoint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (120 requests per minute per IP)"
+          }
+        }
+      }
+    },
+    "/rates/{base}.csv": {
+      "get": {
+        "summary": "All rates for a base currency (CSV)",
+        "operationId": "getRatesCsv",
+        "parameters": [
+          {
+            "name": "base",
+            "in": "path",
+            "required": true,
+            "description": "Base currency",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{3}$",
+              "example": "USD"
+            }
+          },
+          {
+            "name": "decimal",
+            "in": "query",
+            "required": false,
+            "description": "Use `comma` to get a decimal comma in plain-text responses (spreadsheets in many European locales).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "comma"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "CSV with columns currency,rate",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown currency or endpoint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (120 requests per minute per IP)"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Rate": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "number"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "source": {
+            "type": "string"
+          },
+          "docs": {
+            "type": "string"
+          }
+        }
+      },
+      "Conversion": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "rate": {
+            "type": "number"
+          },
+          "result": {
+            "type": "number"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "source": {
+            "type": "string"
+          },
+          "docs": {
+            "type": "string"
+          }
+        }
+      },
+      "Rates": {
+        "type": "object",
+        "properties": {
+          "base": {
+            "type": "string"
+          },
+          "rates": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "source": {
+            "type": "string"
+          },
+          "docs": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
